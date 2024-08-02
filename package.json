@@ -8,8 +8,8 @@
     "format": "biome format --write .",
     "lint": "biome lint --verbose ."
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Graziano Statello",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@playwright/test": "^1.45.3"
