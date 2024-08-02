@@ -1,0 +1,21 @@
+{
+  "name": "fineco-automation",
+  "version": "1.0.0",
+  "description": "automation tools to help humans extract own data from Fineco bank website",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "test",
+    "format": "biome format --write .",
+    "lint": "biome lint --verbose ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@playwright/test": "^1.45.3"
+  },
+  "dependencies": {
+    "tsx": "^4.16.5",
+    "typescript": "^5.5.4"
+  }
+}
