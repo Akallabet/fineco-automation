@@ -4,6 +4,7 @@
   "description": "automation tools to help humans extract own data from Fineco bank website",
   "main": "src/index.ts",
   "scripts": {
+    "download-moneymap-expenses-as-csv": "node --env-file=.env --import tsx ./scripts/download-moneymap-expenses-as-csv.ts",
     "test": "test",
     "format": "biome format --write .",
     "lint": "biome lint --verbose ."
