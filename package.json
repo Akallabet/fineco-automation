@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "automation tools to help humans extract own data from Fineco bank website",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "download-moneymap-expenses-as-csv": "node --env-file=.env --import tsx ./scripts/download-moneymap-expenses-as-csv.ts",
     "test": "test",
@@ -13,7 +14,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
-    "@playwright/test": "^1.45.3"
+    "@playwright/test": "^1.45.3",
+    "@types/node": "^22.1.0"
   },
   "dependencies": {
     "tsx": "^4.16.5",
