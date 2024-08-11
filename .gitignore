@@ -2,4 +2,7 @@ node_modules
 .git
 .env
 .DS_Store
+*.png
+*.csv
 package-lock.json
+

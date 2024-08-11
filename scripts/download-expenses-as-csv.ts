@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import colletcMoneymapExpenses from "../src/moneymap-expenses";
+import colletcMoneymapExpenses from "../src/fineco-expenses";
 
 interface Args {
   username: string;

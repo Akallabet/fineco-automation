@@ -1,0 +1,61 @@
+<html>
+	<body>
+<table class="striped expandable-rows" summary="Tabella Spese" id="tabella-dettaglio-spese" style="position: relative;">
+			<caption><span class="element-for-blind">Tabella Spese</span></caption>
+			<colgroup>
+				<col width="10%">
+				<col width="40%">
+				<col width="20%">
+				<col width="10%">
+				<col width="10%">
+				<col width="10%">
+			</colgroup>
+			<thead>
+			<tr>
+				<th class="editElement"></th>
+				<th class="txt-upc">
+	Data</th>
+				<th class="txt-upc">Descrizione</th>
+				<th class="txt-upc">CATEGORIA</th>
+				<th></th>
+				<th class="txt-upc">Importo</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+																													<tr class="description  odd ">
+					<td class="editElement">
+												<label class="chkBox-label-sx chkBox-grey " for="mov-0">&nbsp;</label>
+						<input id="mov-0" value="0" type="checkbox">
+											</td>
+					<td>07/08/2024</td>
+					<td><b>Voce spesa</b></td>
+					<td>Altre spese<br><i>Altro</i></td>
+					<td>
+												<a class="ico-detail toggle-target tag-ico " href="#movSpese-1" data-tag-summary="" data-movindex="0"></a>
+											</td>
+					<td class="h6 blue"><b>999,40€</b></td>
+					<td>
+												<div class="float-right">
+							<a class="btn-small btn-black btn-sposta-spese prevent-default" href="#prevent-default" data-provenienza="sintesi" data-indice-movimento="0">
+							modifica</a>
+						</div>
+											</td>
+				</tr>
+								<tr id="movSpese-1" class="detail">
+					<td colspan="7">
+						<div class="mvm containerdett">
+							<div id="tagContainerSpese-0" class="div-tags float-left">
+								<div class="tag-ico-gray"></div>
+															</div>
+							<div class="float-left">
+								<input type="text" class="boxtag" data-movindex="0" name="tags" placeholder="Inserisci TAG" maxlength="90">
+							</div>
+							<div class="clear"></div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>
