@@ -10,6 +10,10 @@ fastify.register(fastifyStatic, {
   root: path.join(__dirname, "../public"),
 });
 
+fastify.get("/", async (request, reply) => {
+  return reply.sendFile("expenses-table.html");
+});
+
 export async function start() {
   try {
     await fastify.listen({ port: 3000 })

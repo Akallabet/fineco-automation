@@ -19,6 +19,7 @@
     "@fastify/static": "^7.0.4",
     "@playwright/test": "^1.45.3",
     "@types/node": "^22.1.0",
+    "dotenv": "^16.4.7",
     "fastify": "^4.28.1"
   },
   "dependencies": {
