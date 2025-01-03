@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { JSDOM } from 'jsdom'
 import type { Page } from "playwright";
 import { createPage, tearDown } from "./lib/playwright.ts";
 
@@ -24,8 +25,8 @@ async function askForSecurity({ page }: { page: Page }) {
     .getByRole("link", { name: "SBLOCCA DATI" })
     .last()
     .click();
-  await page.getByRole("dialog").getByText("Conferma operazione").waitFor({state: 'visible'});
-  await page.getByRole("dialog").getByText("Conferma operazione").waitFor({state: 'detached'});
+  await page.getByRole("dialog").getByText("Conferma operazione").waitFor({ state: 'visible' });
+  await page.getByRole("dialog").getByText("Conferma operazione").waitFor({ state: 'detached' });
 }
 
 async function waitForExpenses({ page }: { page: Page }) {
@@ -38,24 +39,32 @@ async function waitForExpenses({ page }: { page: Page }) {
 
 export async function extractExpensesData({ page }: { page: Page }): Promise<{ columns: string[], rows: string[][] }> {
   const content = page.getByRole("table", { name: "Tabella Spese" })
-  await content.waitFor({state: 'visible'})
+  await content.waitFor({ state: 'visible' })
 
-  const [_, ...tableBodyRows] = await content.getByRole("row").all();
   const data: { columns: string[]; rows: string[][] } = {
     columns: ['Data', 'Descrizione', 'Categoria', 'Importo'],
     rows: [],
   };
-  console.info(`Extracting ${tableBodyRows.length} rows`, performance.now());
+  const table = `<table>${await content.innerHTML()}</table>`
 
-  for (const row of tableBodyRows.slice(0, 10)) {
-    const cellsLocator = await row.getByRole("cell").all();
-    const [date, description, category, _, amount] = await Promise.all(cellsLocator.map(cell => cell.innerHTML()));
-    const [mainCategory, subCategory] = category.replace('<br>', '---').split('---');
-    const normalizedAmount = amount.replace('<b>','').replace('</b>','').replace('€','');
-    data.rows.push([date, description.replace('<b>','').replace('</b>',''), mainCategory, subCategory.replace('<i>','').replace('</i>',''), normalizedAmount]);
+  const { window: { document } } = new JSDOM(table)
+
+  const tableBody = document.querySelector('tbody')
+  if (!tableBody) {
+    throw new Error('Table body not found');
   }
 
-  console.log('Extraction finished', performance.now());
+  const rows = Array.from(tableBody.querySelectorAll('tr.description'))
+
+  for (const row of rows) {
+    const cells = Array.from(row.querySelectorAll('td'))
+    const date = cells[1].innerHTML
+    const description = cells[2].innerHTML
+    const category = cells[3].innerHTML.replace('<i>', '').replace('</i>', '')
+    const amount = cells[5].innerHTML
+    const normalizedAmount = amount.replace('<b>', '').replace('</b>', '').replace('€', '');
+    data.rows.push([date, description.replace('<b>', '').replace('</b>', ''), category.replace('<br>', ' - '), normalizedAmount]);
+  }
 
   return data
 
