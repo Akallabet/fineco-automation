@@ -1,7 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import type { Page } from "playwright";
 import { createPage, tearDown } from "./lib/playwright.ts";
-import { expect } from "@playwright/test";
 
 interface ScriptArgs {
   username: string;
@@ -25,9 +24,8 @@ async function askForSecurity({ page }: { page: Page }) {
     .getByRole("link", { name: "SBLOCCA DATI" })
     .last()
     .click();
-  await expect(page.getByRole("dialog").getByText("Conferma operazione")).toBeVisible();
+  await page.getByRole("dialog").getByText("Conferma operazione").waitFor({state: 'visible'});
   await page.getByRole("dialog").getByText("Conferma operazione").waitFor({state: 'detached'});
-  // await expect(page.getByRole("dialog").getByText("Conferma operazione")).toBeNull();
 }
 
 async function waitForExpenses({ page }: { page: Page }) {
@@ -40,7 +38,7 @@ async function waitForExpenses({ page }: { page: Page }) {
 
 export async function extractExpensesData({ page }: { page: Page }): Promise<{ columns: string[], rows: string[][] }> {
   const content = page.getByRole("table", { name: "Tabella Spese" })
-  await expect(content).toBeVisible();
+  await content.waitFor({state: 'visible'})
 
   const [_, ...tableBodyRows] = await content.getByRole("row").all();
   const data: { columns: string[]; rows: string[][] } = {
