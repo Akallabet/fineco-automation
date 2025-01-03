@@ -1,7 +1,8 @@
-import { chromium, Browser, devices, BrowserContext, Page } from "playwright";
+import type { Browser,BrowserContext, Page } from "playwright";
+import { chromium, devices } from "playwright";
 
 export async function createPage() {
-  const browser = await chromium.launch({ headless: false }); // Or 'firefox' or 'webkit'.
+  const browser = await chromium.launch({ headless: true }); // Or 'firefox' or 'webkit'.
   const context = await browser.newContext(devices["Desktop Chrome"]);
   const page = await context.newPage();
   return { browser, context, page };

@@ -1,6 +1,6 @@
-import { writeFile } from "node:fs/promises";
-import { Page } from "playwright";
-import { createPage, tearDown } from "./lib/playwright";
+import { mkdir, writeFile } from "node:fs/promises";
+import type { Page } from "playwright";
+import { createPage, tearDown } from "./lib/playwright.ts";
 import { expect } from "@playwright/test";
 
 interface ScriptArgs {
@@ -25,8 +25,9 @@ async function askForSecurity({ page }: { page: Page }) {
     .getByRole("link", { name: "SBLOCCA DATI" })
     .last()
     .click();
-  await page.getByRole("dialog").getByText("Conferma operazione").isVisible();
-  await page.getByRole("dialog").getByText("Conferma operazione").isHidden();
+  await expect(page.getByRole("dialog").getByText("Conferma operazione")).toBeVisible();
+  await page.getByRole("dialog").getByText("Conferma operazione").waitFor({state: 'detached'});
+  // await expect(page.getByRole("dialog").getByText("Conferma operazione")).toBeNull();
 }
 
 async function waitForExpenses({ page }: { page: Page }) {
@@ -41,23 +42,22 @@ export async function extractExpensesData({ page }: { page: Page }): Promise<{ c
   const content = page.getByRole("table", { name: "Tabella Spese" })
   await expect(content).toBeVisible();
 
-  // const rows = await content.getByRole("row").all();
-  const rowsHeader = await content.getByRole("rowheader").all();
-  console.log(rowsHeader)
-  const [tableHead, tableBody] = await content.getByRole("rowgroup").all();
-  console.info(tableHead)
+  const [_, ...tableBodyRows] = await content.getByRole("row").all();
   const data: { columns: string[]; rows: string[][] } = {
-    columns: [],
+    columns: ['Data', 'Descrizione', 'Categoria', 'Importo'],
     rows: [],
   };
-  const headerRows = await tableHead.getByRole("columnheader").all()
-  console.log(headerRows)
-  for await (const cell of headerRows) {
-    const text = await cell.textContent();
-    if (text) {
-      data.columns.push(text);
-    }
+  console.info(`Extracting ${tableBodyRows.length} rows`, performance.now());
+
+  for (const row of tableBodyRows.slice(0, 10)) {
+    const cellsLocator = await row.getByRole("cell").all();
+    const [date, description, category, _, amount] = await Promise.all(cellsLocator.map(cell => cell.innerHTML()));
+    const [mainCategory, subCategory] = category.replace('<br>', '---').split('---');
+    const normalizedAmount = amount.replace('<b>','').replace('</b>','').replace('€','');
+    data.rows.push([date, description.replace('<b>','').replace('</b>',''), mainCategory, subCategory.replace('<i>','').replace('</i>',''), normalizedAmount]);
   }
+
+  console.log('Extraction finished', performance.now());
 
   return data
 
@@ -88,9 +88,9 @@ export async function colletcMoneymapExpenses({ page, username, password }: { pa
 
   console.info('Writing csv');
 
-  await writeFile("moneymap-expenses.csv", `${data.columns.join(",")}\n`);
+  await mkdir("results", { recursive: true });
 
-  await page.screenshot({ path: "example.png" });
+  await writeFile("results/moneymap-expenses.tsv", `${data.columns.join("\t")}\n${data.rows.map(row => row.join("\t")).join("\n")}`);
 }
 
 async function colletcMoneymapExpensesWithAuth(args: ScriptArgs) {

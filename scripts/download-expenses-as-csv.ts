@@ -1,6 +1,6 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-strip-types
 
-import colletcMoneymapExpenses from "../src/fineco-expenses";
+import colletcMoneymapExpenses from "../src/fineco-expenses.ts";
 
 interface Args {
   username: string;
