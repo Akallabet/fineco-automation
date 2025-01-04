@@ -42,7 +42,7 @@ export async function extractExpensesData({ page }: { page: Page }): Promise<{ c
   await content.waitFor({ state: 'visible' })
 
   const data: { columns: string[]; rows: string[][] } = {
-    columns: ['Data', 'Descrizione', 'Categoria', 'Importo'],
+    columns: ['Data', 'Descrizione', 'Originale', 'Categoria', 'Sotto Categoria', 'Tags', 'Importo'],
     rows: [],
   };
   const table = `<table>${await content.innerHTML()}</table>`
@@ -54,16 +54,26 @@ export async function extractExpensesData({ page }: { page: Page }): Promise<{ c
     throw new Error('Table body not found');
   }
 
-  const rows = Array.from(tableBody.querySelectorAll('tr.description'))
+  const rows = Array.from(tableBody.querySelectorAll('tr'))
 
   for (const row of rows) {
-    const cells = Array.from(row.querySelectorAll('td'))
-    const date = cells[1].innerHTML
-    const description = cells[2].innerHTML
-    const category = cells[3].innerHTML.replace('<i>', '').replace('</i>', '')
-    const amount = cells[5].innerHTML
-    const normalizedAmount = amount.replace('<b>', '').replace('</b>', '').replace('€', '');
-    data.rows.push([date, description.replace('<b>', '').replace('</b>', ''), category.replace('<br>', ' - '), normalizedAmount]);
+    if (row.classList.contains('description')) {
+      const cells = Array.from(row.querySelectorAll('td'))
+      const date = cells[1].innerHTML
+      const description = cells[2].innerHTML
+      const originalCategory = cells[3].innerHTML.replace('<i>', '').replace('</i>', '').replace('<br>', ' - ')
+      const category = originalCategory.split(' - ')[0]
+      const subCategory = originalCategory.split(' - ')[1]
+      const amount = cells[5].innerHTML
+      const normalizedAmount = amount.replace('<b>', '').replace('</b>', '').replace('€', '');
+      data.rows.push([date, description.replace('<b>', '').replace('</b>', ''), originalCategory, category, subCategory, '', normalizedAmount]);
+    }
+    if (row.classList.contains('detail')) {
+      const tags = Array.from(row.querySelectorAll('.div-tags>a')).map(tag => tag.childNodes.item(0).textContent?.trim())
+      if (tags.length > 0) {
+        data.rows[data.rows.length - 1][5] = tags.join(';')
+      }
+    }
   }
 
   return data
